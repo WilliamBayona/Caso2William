@@ -1,45 +1,62 @@
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        if (args.length == 0) {
-            System.out.println("Por favor, especifique una opción.");
-            System.out.println("Uso: java Main <opcion> [argumentos]");
-            System.out.println("Opciones:");
-            System.out.println("  1 <archivo_config>       : Generar archivos de referencias.");
-            System.out.println("  2 <num_marcos> <num_proc>: Ejecutar simulación.");
-            return;
-        }
+        Scanner scanner = new Scanner(System.in);
 
-        String opcion = args[0];
+        while (true) {
+            System.out.println("\n== SIMULADOR DE MEMORIA VIRTUAL ==");
+            System.out.println("1. Generar archivos de referencias (Opción 1)");
+            System.out.println("2. Ejecutar simulación de memoria virtual (Opción 2)");
+            System.out.println("3. Salir");
+            System.out.print("Seleccione una opción: ");
 
-        if (opcion.equals("1")) {
-            if (args.length < 2) {
-                System.out.println("Uso para Opción 1: java Main 1 <archivo_config>");
-                return;
+            String opcion = scanner.nextLine();
+
+            switch (opcion) {
+                case "1":
+                    // --- Lógica para la Opción 1 ---
+                    System.out.print("Ingrese el nombre del archivo de configuración (ej: config.txt): ");
+                    String archivoConfig = scanner.nextLine();
+                    GeneradorReferencias generador = new GeneradorReferencias();
+                    generador.generar(archivoConfig);
+                    break;
+
+                case "2":
+                    // --- Lógica para la Opción 2 ---
+                    try {
+                        System.out.print("Ingrese el número total de marcos de RAM: ");
+                        int marcos = Integer.parseInt(scanner.nextLine());
+
+                        System.out.print("Ingrese el número de procesos a simular: ");
+                        int procesos = Integer.parseInt(scanner.nextLine());
+
+                        // Validación para asegurar que los marcos son múltiplos de los procesos
+                        if (marcos % procesos != 0) {
+                            System.err.println("Error: El número de marcos debe ser múltiplo del número de procesos.");
+                            continue; // Vuelve al menú principal
+                        }
+
+                        Simulador sim = new Simulador(marcos, procesos);
+                        sim.iniciar();
+                        sim.simular();
+                        sim.imprimirEstadisticas();
+
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error: Por favor, ingrese un número válido.");
+                    }
+                    break;
+
+                case "3":
+                    // --- Salir del programa ---
+                    System.out.println("Saliendo del simulador...");
+                    scanner.close();
+                    return; // Termina el programa
+
+                default:
+                    System.out.println("Opción no válida. Por favor, intente de nuevo.");
+                    break;
             }
-            String archivoConfig = args[1];
-            GeneradorReferencias generador = new GeneradorReferencias();
-            generador.generar(archivoConfig);
-
-        } else if (opcion.equals("2")) {
-            if (args.length < 3) {
-                System.out.println("Uso para Opción 2: java Main 2 <num_marcos> <num_proc>");
-                return;
-            }
-            int marcos = Integer.parseInt(args[1]);
-            int procesos = Integer.parseInt(args[2]);
-
-            if (marcos % procesos != 0) {
-                 System.out.println("Error: El número de marcos debe ser múltiplo del número de procesos.");
-                 return;
-            }
-
-            Simulador sim = new Simulador(marcos, procesos);
-            sim.iniciar();
-            sim.simular();
-            sim.imprimirEstadisticas();
-            
-        } else {
-            System.out.println("Opción no válida. Use '1' o '2'.");
         }
     }
 }

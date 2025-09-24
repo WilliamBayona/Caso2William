@@ -29,7 +29,7 @@ public class Simulador {
                 listaProcesos.add(p);
                 colaProcesos.add(p);
             } catch (IOException e) {
-                System.err.println("Error fatal: No se pudo leer el archivo proc" + i + ".txt");
+                System.err.println(" No se pudo leer el archivo proc" + i + ".txt");
                 return;
             }
         }
@@ -48,10 +48,10 @@ public class Simulador {
         System.out.println("Simulación:");
         while (!colaProcesos.isEmpty()) {
             Proceso actual = colaProcesos.poll();
-            
+
             System.out.println("Turno proc: " + actual.getId());
             System.out.println("PROC " + actual.getId() + " analizando linea_: " + actual.getPtrInstruccion());
-            
+
             int paginaVirtual = Integer.parseInt(actual.getSiguienteReferencia().split(",")[1]);
             EntradaTablaPaginas pte = actual.getTablaPaginas().get(paginaVirtual);
 
@@ -64,7 +64,7 @@ public class Simulador {
                 System.out.println("PROC " + actual.getId() + " falla de pag: " + actual.getFallosDePagina());
                 manejarFalloDePagina(actual, paginaVirtual);
             }
-            
+
             actual.actualizarLRU(paginaVirtual);
             System.out.println("PROC " + actual.getId() + " envejecimiento");
 
@@ -79,7 +79,7 @@ public class Simulador {
         }
         System.out.println("\n>>> Simulación Terminada <<<");
     }
-    
+
     private void manejarFalloDePagina(Proceso proceso, int paginaVirtual) {
         Set<Integer> marcosOcupados = new HashSet<>();
         proceso.getTablaPaginas().values().stream()
@@ -103,7 +103,7 @@ public class Simulador {
             int paginaVictima = proceso.encontrarVictimaLRU();
             EntradaTablaPaginas pteVictima = proceso.getTablaPaginas().get(paginaVictima);
             int marcoReemplazo = pteVictima.getNumMarco();
-            
+
             pteVictima.setValida(false);
             pteVictima.setNumMarco(-1);
 
@@ -113,7 +113,7 @@ public class Simulador {
             proceso.registrarAccesoSwap(2);
         }
     }
-    
+
     private void reasignarMarcos(Proceso procesoTerminado) {
         if (colaProcesos.isEmpty()) { return; }
 
@@ -139,11 +139,8 @@ public class Simulador {
         for (Proceso p : listaProcesos) {
             int totalReferencias = p.getTotalReferencias();
             int fallos = p.getFallosDePagina();
-            // CORRECCIÓN FINAL: Los hits para las estadísticas se calculan
-            // correctamente como el total de referencias menos los fallos.
             int hits = totalReferencias - fallos;
             int swap = p.getAccesosASwap();
-
             double tasaFallos = (totalReferencias > 0) ? (double) fallos / totalReferencias : 0;
             double tasaExito = (totalReferencias > 0) ? (double) hits / totalReferencias : 0;
             
